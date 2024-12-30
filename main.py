@@ -1,22 +1,19 @@
 # Script: main.py
 # Author: Andrew Smith
-# Date: June 2022
-# Description: Experimentation project
+# Date: December 2024
+# Description: Irn-Bru and Caramel Wafer project
 
 import pygame
 
-# Screen size settings
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+# Initialise PyGame
+pygame.init()
 
 # Background image position values
 backimg_x = 0
 backimg_y = 0
 
-animation_increment=10
+# animation_increment=10
 clock_tick_rate=20
-
-pygame.init()
 
 # getScreenMode 
 # This function will set the screen mode 2 modes below the current one
@@ -61,6 +58,9 @@ def getScreenMode():
 # Set and get screen mode 
 screen = pygame.display.set_mode(getScreenMode())
 
+screenX = (screen.get_width() / 2) - 300
+screenY = (screen.get_height() / 2) - 300
+
 # RGB
 # 0, 163, 232
 
@@ -75,25 +75,16 @@ grassfloor_img = pygame.image.load("images/floortile01.jpg").convert()
 floorlight_img = pygame.image.load("images/floortile01b.jpg").convert()
 
 # Scale down the grass floor image 
-grassfloor_img = pygame.transform.scale(grassfloor_img, (100,100))
-floorlight_img = pygame.transform.scale(floorlight_img, (100,100))
+grassfloor_img = pygame.transform.scale(grassfloor_img, (50,50))
+floorlight_img = pygame.transform.scale(floorlight_img, (50,50))
 
 # Load in texture for concrete floor 
 concretefloor_img = pygame.image.load("images/concretefloor.jpg").convert()
 
 # Scale down the concrete floor image 
-concretefloor_img = pygame.transform.scale(concretefloor_img, (100,100))
+concretefloor_img = pygame.transform.scale(concretefloor_img, (50,50))
 
-
-# Load the Bridge image 
-bridge_img = pygame.image.load("images/bridgefloor.jpg").convert()
-
-# Scale down the bridge image 
-bridge_img = pygame.transform.scale(bridge_img, (100,100))
-
-
-
-pygame.display.set_caption("Test Project001")
+pygame.display.set_caption("Irn-Bru Project")
 
 dead=False
 
@@ -103,27 +94,36 @@ clock = pygame.time.Clock()
 # Description: This function is going to be used to create the grid 
 def create_grid(posxin, posyin, widthin, heightin):
     global grassfloor_img 
-    global floorlight_img
     
     griddata = [] # Stores all grid data
     
-    # Calculate actual width
-    widthtotal = ((widthin) * grassfloor_img.get_width()) # 100 px
-    heighttotal = ((heightin+1) * grassfloor_img.get_height()) # 100 px 
-    
+    # Get start position to start creating GridSquare objects (horizontal)
     startposx = posxin
+    
+    # Get start position to start creating GridSquare objects (vertical)
+    startposy = posyin
+    
+    # Set increment value for hotizontal placing...
+    horizIncrementValue = grassfloor_img.get_width()
+    
+    # Set vertical increment value 
+    vertIncrementValue = grassfloor_img.get_height()
 
-    while posyin < heighttotal:        
-        while posxin < widthtotal:
-            # Store first grid square 
-            griddata.append(pygame.Rect(posxin,posyin,(widthin*grassfloor_img.get_width()),(heightin*grassfloor_img.get_height())))
-            posxin = posxin + grassfloor_img.get_width()
-        griddata.append(pygame.Rect(posxin,posyin,(widthin*grassfloor_img.get_width()),(heightin*grassfloor_img.get_height())))
-        posyin = posyin + grassfloor_img.get_height()        
-        posxin = startposx
-        # Store first grid square 
-        
-        
+    # Algothithm to create gaming grid 
+    xCounter = 0
+    yCounter = 0
+    while yCounter < heightin:
+        while xCounter < widthin:
+            griddata.append(pygame.Rect(startposx,startposy,(widthin*grassfloor_img.get_width()),(heightin*grassfloor_img.get_height())))
+            startposx = (startposx+horizIncrementValue)
+            xCounter = xCounter + 1
+        # Reset values
+        xCounter = 0
+        startposx = posxin 
+    
+        startposy = (startposy+vertIncrementValue)
+        yCounter = yCounter + 1
+
     return griddata
     
     
@@ -143,9 +143,11 @@ def draw_grid(gridDataIn, screenIn):
 
 
     
-# Create room 1
-room1data = create_grid(100,100,10,10)
-
+# Create Game Grid
+room1data = create_grid(screenX,screenY,10,10)
+print(screenX)
+print(screenY)
+print(len(room1data))
 
 
 while(dead==False):
@@ -162,38 +164,11 @@ while(dead==False):
                 dead = True
 
     
-    # draw_grid(100,100,10,10, screen)
-    
-    # screen.blit(grassfloor_img, (100,100))
-    
-    # Output graphics to the screen (Island one)
-    '''
-    screen.blit(concretefloor_img, (100,400))
-    screen.blit(concretefloor_img, (100,500))
-    screen.blit(concretefloor_img, (100,600))
-    
-    screen.blit(concretefloor_img, (100,700))
-    screen.blit(concretefloor_img, (200,700))
-    screen.blit(concretefloor_img, (300,700))
-    
-    screen.blit(concretefloor_img, (100,300))
-    screen.blit(concretefloor_img, (200,300))
-    screen.blit(concretefloor_img, (300,300))
-    '''
+
     
     draw_grid(room1data,screen)
-    screen.blit(gameCharacter_img, (200,200))
-        
-        
-    #screen.blit(grassfloor_img, (200,500))
-    #screen.blit(grassfloor_img, (300,400))
-    #screen.blit(grassfloor_img, (300,500))
-    #screen.blit(grassfloor_img, (200,600))
-    #screen.blit(grassfloor_img, (300,600))
-    
-    # Output the bridge for the island
-    # screen.blit(bridge_img, (400,500))
-    
+    # screen.blit(gameCharacter_img, (200,200))
+
     
     
     
