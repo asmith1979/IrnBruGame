@@ -58,6 +58,7 @@ def getScreenMode():
 # Set and get screen mode 
 screen = pygame.display.set_mode(getScreenMode())
 
+# Get centre of screen values 
 screenX = (screen.get_width() / 2) - 300
 screenY = (screen.get_height() / 2) - 300
 
@@ -71,18 +72,14 @@ background_colour = (0, 163, 232)
 gameCharacter_img = pygame.image.load("images/character.jpg").convert()
 
 # Grass floor image 
-grassfloor_img = pygame.image.load("images/floortile01.jpg").convert()
+standard_GridSquare_img = pygame.image.load("images/floortile01.jpg").convert()
+block_GridSquare_img = pygame.image.load("images/wall01.jpg").convert()
+
 floorlight_img = pygame.image.load("images/floortile01b.jpg").convert()
 
 # Scale down the grass floor image 
-grassfloor_img = pygame.transform.scale(grassfloor_img, (50,50))
-floorlight_img = pygame.transform.scale(floorlight_img, (50,50))
-
-# Load in texture for concrete floor 
-concretefloor_img = pygame.image.load("images/concretefloor.jpg").convert()
-
-# Scale down the concrete floor image 
-concretefloor_img = pygame.transform.scale(concretefloor_img, (50,50))
+standard_GridSquare_img = pygame.transform.scale(standard_GridSquare_img, (100,100))
+block_GridSquare_img = pygame.transform.scale(block_GridSquare_img, (100,100))
 
 pygame.display.set_caption("Irn-Bru Project")
 
@@ -90,10 +87,38 @@ dead=False
 
 clock = pygame.time.Clock()
 
+def setGameWorld():
+    global room1data
+    
+    # Set L block square 
+    room1data[21][1] = 1
+    room1data[31][1] = 1
+    room1data[41][1] = 1
+    room1data[42][1] = 1
+    room1data[43][1] = 1
+    
+    # Set 2nd block square 
+    room1data[46][1] = 1
+    room1data[47][1] = 1
+    room1data[48][1] = 1
+    room1data[58][1] = 1
+    room1data[68][1] = 1
+    
+    # Create Rectangle square block 
+    room1data[63][1] = 1
+    room1data[73][1] = 1
+    room1data[64][1] = 1
+    room1data[74][1] = 1
+    room1data[65][1] = 1
+    room1data[75][1] = 1
+    
+    
+    
+
 # Function: create_grid
 # Description: This function is going to be used to create the grid 
 def create_grid(posxin, posyin, widthin, heightin):
-    global grassfloor_img 
+    global standard_GridSquare_img 
     
     griddata = [] # Stores all grid data
     
@@ -104,17 +129,17 @@ def create_grid(posxin, posyin, widthin, heightin):
     startposy = posyin
     
     # Set increment value for hotizontal placing...
-    horizIncrementValue = grassfloor_img.get_width()
+    horizIncrementValue = standard_GridSquare_img.get_width()
     
     # Set vertical increment value 
-    vertIncrementValue = grassfloor_img.get_height()
+    vertIncrementValue = standard_GridSquare_img.get_height()
 
     # Algothithm to create gaming grid 
     xCounter = 0
     yCounter = 0
     while yCounter < heightin:
         while xCounter < widthin:
-            griddata.append(pygame.Rect(startposx,startposy,(widthin*grassfloor_img.get_width()),(heightin*grassfloor_img.get_height())))
+            griddata.append([pygame.Rect(startposx,startposy,(widthin*standard_GridSquare_img.get_width()),(heightin*standard_GridSquare_img.get_height())),0])
             startposx = (startposx+horizIncrementValue)
             xCounter = xCounter + 1
         # Reset values
@@ -135,16 +160,19 @@ def create_grid(posxin, posyin, widthin, heightin):
 #               a specified position and width and height
 def draw_grid(gridDataIn, screenIn):
     # Include the texture    
-    global grassfloor_img
-    global floorlight_img
+    global standard_GridSquare_img
     
     for gridTile in gridDataIn:
-        screenIn.blit(grassfloor_img, gridTile)
-
+        if gridTile[1] == 0:
+            screenIn.blit(standard_GridSquare_img, gridTile[0])
+        if gridTile[1] == 1:
+            screenIn.blit(block_GridSquare_img, gridTile[0])
 
     
 # Create Game Grid
 room1data = create_grid(screenX,screenY,10,10)
+# Setup game grid
+setGameWorld()
 print(screenX)
 print(screenY)
 print(len(room1data))
@@ -167,11 +195,7 @@ while(dead==False):
 
     
     draw_grid(room1data,screen)
-    # screen.blit(gameCharacter_img, (200,200))
 
-    
-    
-    
     pygame.display.flip()
     clock.tick(clock_tick_rate)
 pygame.quit()
