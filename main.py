@@ -56,7 +56,8 @@ def getScreenMode():
     return selectedScreenMode
 
 # Set and get screen mode 
-screen = pygame.display.set_mode(getScreenMode())
+screenMode = getScreenMode()
+screen = pygame.display.set_mode(screenMode)
 
 # Get centre of screen values 
 screenX = (screen.get_width() / 2) - 300
@@ -75,11 +76,25 @@ gameCharacter_img = pygame.image.load("images/character.jpg").convert()
 standard_GridSquare_img = pygame.image.load("images/floortile01.jpg").convert()
 block_GridSquare_img = pygame.image.load("images/wall01.jpg").convert()
 
+sandfloor_img = pygame.image.load("images/sand_img.jpg").convert()
+shrub_img = pygame.image.load("images/shrub_img.jpg").convert()
+
+# Load Irn-Bru can image 
+irnBruCan = pygame.image.load("images/irnbrucan.jpg").convert()
+
+# Load Wafer image 
+wafer_img = pygame.image.load("images/wafer_img.jpg").convert()
+
+# Background image 
+background_img = pygame.image.load("images/background_img.jpg").convert()
+
 floorlight_img = pygame.image.load("images/floortile01b.jpg").convert()
 
 # Scale down the grass floor image 
-standard_GridSquare_img = pygame.transform.scale(standard_GridSquare_img, (100,100))
+standard_GridSquare_img = pygame.transform.scale(standard_GridSquare_img, (50,50))
 block_GridSquare_img = pygame.transform.scale(block_GridSquare_img, (100,100))
+# shrub_img = pygame.transform.scale(shrub_img, (50,50))
+background_img = pygame.transform.scale(background_img, screenMode)
 
 pygame.display.set_caption("Irn-Bru Project")
 
@@ -119,6 +134,7 @@ def setGameWorld():
 # Description: This function is going to be used to create the grid 
 def create_grid(posxin, posyin, widthin, heightin):
     global standard_GridSquare_img 
+    global sandfloor_img
     
     griddata = [] # Stores all grid data
     
@@ -129,17 +145,17 @@ def create_grid(posxin, posyin, widthin, heightin):
     startposy = posyin
     
     # Set increment value for hotizontal placing...
-    horizIncrementValue = standard_GridSquare_img.get_width()
+    horizIncrementValue = sandfloor_img.get_width()
     
     # Set vertical increment value 
-    vertIncrementValue = standard_GridSquare_img.get_height()
+    vertIncrementValue = sandfloor_img.get_height()
 
     # Algothithm to create gaming grid 
     xCounter = 0
     yCounter = 0
     while yCounter < heightin:
         while xCounter < widthin:
-            griddata.append([pygame.Rect(startposx,startposy,(widthin*standard_GridSquare_img.get_width()),(heightin*standard_GridSquare_img.get_height())),0])
+            griddata.append([pygame.Rect(startposx,startposy,(widthin*sandfloor_img.get_width()),(heightin*sandfloor_img.get_height())),0])
             startposx = (startposx+horizIncrementValue)
             xCounter = xCounter + 1
         # Reset values
@@ -161,16 +177,18 @@ def create_grid(posxin, posyin, widthin, heightin):
 def draw_grid(gridDataIn, screenIn):
     # Include the texture    
     global standard_GridSquare_img
+    global sandfloor_img
+    global shrub_img
     
     for gridTile in gridDataIn:
         if gridTile[1] == 0:
-            screenIn.blit(standard_GridSquare_img, gridTile[0])
+            screenIn.blit(sandfloor_img, gridTile[0])
         if gridTile[1] == 1:
-            screenIn.blit(block_GridSquare_img, gridTile[0])
+            screenIn.blit(shrub_img, gridTile[0])
 
     
 # Create Game Grid
-room1data = create_grid(screenX,screenY,10,10)
+room1data = create_grid(100,100,10,10)
 # Setup game grid
 setGameWorld()
 print(screenX)
@@ -194,7 +212,11 @@ while(dead==False):
     
 
     
-    draw_grid(room1data,screen)
+    screen.blit(background_img, (0,0))
+    draw_grid(room1data,screen)    
+    screen.blit(irnBruCan, (1200, 100))
+    screen.blit(wafer_img, (1450, 150))
+    
 
     pygame.display.flip()
     clock.tick(clock_tick_rate)
