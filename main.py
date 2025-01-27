@@ -4,6 +4,7 @@
 # Description: Irn-Bru and Caramel Wafer project
 
 import pygame
+import pygame.freetype
 
 # Initialise PyGame
 pygame.init()
@@ -63,37 +64,88 @@ screen = pygame.display.set_mode(screenMode)
 screenX = (screen.get_width() / 2) - 300
 screenY = (screen.get_height() / 2) - 300
 
-# RGB
-# 0, 163, 232
+player_x_pos = 300
+player_y_pos = 300
 
-# Set background colour of water
-background_colour = (0, 163, 232)
+# Load a font to use for the game 
+GAME_FONT = pygame.freetype.Font("font/typewriter.ttf", 72)
 
-# Load game character
-gameCharacter_img = pygame.image.load("images/character.jpg").convert()
+transcolour = (0,255,33)
 
-# Grass floor image 
-standard_GridSquare_img = pygame.image.load("images/floortile01.jpg").convert()
-block_GridSquare_img = pygame.image.load("images/wall01.jpg").convert()
+# Irn Bru can object
+irnBruObj_img = pygame.image.load("images/irnbruobj.png").convert()
 
-sandfloor_img = pygame.image.load("images/sand_img.jpg").convert()
-shrub_img = pygame.image.load("images/shrub_img.jpg").convert()
+# Basic direction images (Front,back,left,right)
+characterFront_img = pygame.image.load("images/charfront.png").convert()
+characterBack_img = pygame.image.load("images/charback.png").convert()
+characterLeft_img = pygame.image.load("images/charleft.png").convert()
+characterRight_img = pygame.image.load("images/charright.png").convert()
+
+# Front walking images 
+characterFront01_img = pygame.image.load("images/charfront01.png").convert()
+characterFront02_img = pygame.image.load("images/charfront02.png").convert()
+
+# Back walking images 
+characterBack01_img = pygame.image.load("images/charback01.png").convert()
+characterBack02_img = pygame.image.load("images/charback02.png").convert()
+
+# Left walking images 
+characterLeft01_img = pygame.image.load("images/charleft01.png").convert()
+characterLeft02_img = pygame.image.load("images/charleft02.png").convert()
+
+# Right walking images
+characterRight01_img = pygame.image.load("images/charright01.png").convert()
+characterRight02_img = pygame.image.load("images/charright02.png").convert()
+
+screen.set_colorkey(transcolour)
+characterFront_img.set_colorkey(transcolour)
+characterBack_img.set_colorkey(transcolour)
+characterLeft_img.set_colorkey(transcolour)
+characterRight_img.set_colorkey(transcolour)
+characterFront01_img.set_colorkey(transcolour)
+characterFront02_img.set_colorkey(transcolour)
+characterBack01_img.set_colorkey(transcolour)
+characterBack02_img.set_colorkey(transcolour)
+characterLeft01_img.set_colorkey(transcolour)
+characterLeft02_img.set_colorkey(transcolour)
+characterRight01_img.set_colorkey(transcolour)
+characterRight02_img.set_colorkey(transcolour)
+
+irnBruObj_img.set_colorkey(transcolour)
+
+# Load the Game Grid image
+game_grid = pygame.image.load("images/gamegrid.jpg").convert()
 
 # Load Irn-Bru can image 
-irnBruCan = pygame.image.load("images/irnbrucan.jpg").convert()
+irnBruCan = pygame.image.load("images/irnbrucan.png").convert()
+irnBruCan.set_colorkey(transcolour)
 
 # Load Wafer image 
 wafer_img = pygame.image.load("images/wafer_img.jpg").convert()
 
+wafer_obj = wafer_img 
+
+wafer_obj = pygame.transform.scale(wafer_obj, (50,25))
+
 # Background image 
 background_img = pygame.image.load("images/background_img.jpg").convert()
 
-floorlight_img = pygame.image.load("images/floortile01b.jpg").convert()
-
 # Scale down the grass floor image 
-standard_GridSquare_img = pygame.transform.scale(standard_GridSquare_img, (50,50))
-block_GridSquare_img = pygame.transform.scale(block_GridSquare_img, (100,100))
-# shrub_img = pygame.transform.scale(shrub_img, (50,50))
+characterFront_img = pygame.transform.scale(characterFront_img, (50,50))
+characterBack_img = pygame.transform.scale(characterBack_img, (50,50))
+characterLeft_img = pygame.transform.scale(characterLeft_img, (50,50))
+characterRight_img = pygame.transform.scale(characterRight_img, (50,50))
+characterFront01_img = pygame.transform.scale(characterFront01_img, (50,50))
+characterFront02_img = pygame.transform.scale(characterFront02_img, (50,50))
+characterBack01_img = pygame.transform.scale(characterBack01_img, (50,50))
+characterBack02_img = pygame.transform.scale(characterBack02_img, (50,50))
+characterLeft01_img = pygame.transform.scale(characterLeft01_img, (50,50))
+characterLeft02_img = pygame.transform.scale(characterLeft02_img, (50,50))
+characterRight01_img = pygame.transform.scale(characterRight01_img, (50,50))
+characterRight02_img = pygame.transform.scale(characterRight02_img, (50,50))
+
+irnBruObj_img = pygame.transform.scale(irnBruObj_img, (30,50))
+
 background_img = pygame.transform.scale(background_img, screenMode)
 
 pygame.display.set_caption("Irn-Bru Project")
@@ -126,50 +178,7 @@ def setGameWorld():
     room1data[74][1] = 1
     room1data[65][1] = 1
     room1data[75][1] = 1
-    
-    
-    
 
-# Function: create_grid
-# Description: This function is going to be used to create the grid 
-def create_grid(posxin, posyin, widthin, heightin):
-    global standard_GridSquare_img 
-    global sandfloor_img
-    
-    griddata = [] # Stores all grid data
-    
-    # Get start position to start creating GridSquare objects (horizontal)
-    startposx = posxin
-    
-    # Get start position to start creating GridSquare objects (vertical)
-    startposy = posyin
-    
-    # Set increment value for hotizontal placing...
-    horizIncrementValue = sandfloor_img.get_width()
-    
-    # Set vertical increment value 
-    vertIncrementValue = sandfloor_img.get_height()
-
-    # Algothithm to create gaming grid 
-    xCounter = 0
-    yCounter = 0
-    while yCounter < heightin:
-        while xCounter < widthin:
-            griddata.append([pygame.Rect(startposx,startposy,(widthin*sandfloor_img.get_width()),(heightin*sandfloor_img.get_height())),0])
-            startposx = (startposx+horizIncrementValue)
-            xCounter = xCounter + 1
-        # Reset values
-        xCounter = 0
-        startposx = posxin 
-    
-        startposy = (startposy+vertIncrementValue)
-        yCounter = yCounter + 1
-
-    return griddata
-    
-    
-    
-    
 
 # Function: draw_grid
 # Description: This function is used to draw a grid (room) at
@@ -187,35 +196,148 @@ def draw_grid(gridDataIn, screenIn):
             screenIn.blit(shrub_img, gridTile[0])
 
     
-# Create Game Grid
-room1data = create_grid(100,100,10,10)
-# Setup game grid
-setGameWorld()
-print(screenX)
-print(screenY)
-print(len(room1data))
+screen.blit(background_img, (0,0))
+screen.blit(game_grid, (100,100))
+screen.blit(irnBruCan, (1200, 100))
+screen.blit(wafer_img, (1450, 150))
+screen.blit(characterFront_img, (player_x_pos,player_y_pos))
+directionIndicator = 0 # Front facing (down direction)
 
+# Animation stages
+leftStage = 0
+rightStage = 0
+upStage = 0
+downStage = 0
 
-while(dead==False):
-    # Fill screen with the background colour 
-    screen.fill(background_colour)    
-    
+player_speed = 8
+
+irnbruobj_x_pos = 500
+irnbruobj_y_pos = 500
+canActive = True
+
+waferobj_x_pos = 600
+waferobj_y_pos = 600
+
+irnBruScore = 0
+waferScore = 0
+
+while(dead==False):    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             dead = True
             
-        if event.type == pygame.KEYDOWN:
-            # Check to see if the Escape key has been pressed
+        if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+            # Check to see if the Escape key has been pressed (exit's the game program)
             if event.key == pygame.K_ESCAPE:
                 dead = True
+                
+    keys = pygame.key.get_pressed()
 
-    
+    if keys[pygame.K_RIGHT]:
+        player_x_pos = player_x_pos + player_speed
+        rightStage = rightStage + 1
+        directionIndicator = 2
+        
+    if keys[pygame.K_LEFT]:
+        player_x_pos = player_x_pos - player_speed
+        leftStage = leftStage + 1
+        directionIndicator = 3
+        
+    if keys[pygame.K_UP]:
+        player_y_pos = player_y_pos - player_speed
+        upStage = upStage + 1
+        directionIndicator = 1
+        
+    if keys[pygame.K_DOWN]:
+         player_y_pos = player_y_pos + player_speed
+         downStage = downStage + 1
+         directionIndicator = 0
 
-    
     screen.blit(background_img, (0,0))
-    draw_grid(room1data,screen)    
+    screen.blit(game_grid, (100,100))   
     screen.blit(irnBruCan, (1200, 100))
     screen.blit(wafer_img, (1450, 150))
+    
+    text_surface, rect = GAME_FONT.render(str(irnBruScore), (0, 255, 33))
+    screen.blit(text_surface, (1350, 150))
+    
+    waferscore, rect = GAME_FONT.render(str(waferScore), (0,255,33))
+    screen.blit(waferscore, (1850,150))
+    
+    timelimit, rect = GAME_FONT.render("TIME - ", (0,255,33))
+    screen.blit(timelimit, (600,25))
+    
+    timelimitvalue, rect = GAME_FONT.render("0:00", (0,255,33))
+    screen.blit(timelimitvalue, (900,25))
+    
+    # Output objects on game grid 
+    if canActive == True:
+        screen.blit(irnBruObj_img, (irnbruobj_x_pos,irnbruobj_y_pos))
+    
+    screen.blit(wafer_obj, (waferobj_x_pos,waferobj_y_pos))  
+
+    if player_x_pos >= irnbruobj_x_pos and player_x_pos <= (irnbruobj_x_pos+30) and player_y_pos >= irnbruobj_y_pos and player_y_pos <= (irnbruobj_y_pos+50) and canActive == True:
+        irnBruScore = irnBruScore + 2
+        canActive = False 
+    
+    
+    if directionIndicator == 0: # Travelling Down
+        if downStage == 0:
+            screen.blit(characterFront01_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if downStage == 1:
+            screen.blit(characterFront_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if downStage == 2:
+            screen.blit(characterFront02_img, (player_x_pos, player_y_pos))
+            downStage = 0
+            pygame.time.delay(50)
+            
+        
+        
+    if directionIndicator == 1: # Travelling Up
+        if upStage == 0:
+            screen.blit(characterBack01_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if upStage == 1:
+            screen.blit(characterBack_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if upStage == 2:
+            screen.blit(characterBack02_img, (player_x_pos,player_y_pos))
+            upStage = 0
+            pygame.time.delay(50)
+        
+    if directionIndicator == 2: # Travelling Right 
+        if rightStage == 0:
+            screen.blit(characterRight01_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if rightStage == 1:
+            screen.blit(characterRight_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if rightStage == 2:
+            screen.blit(characterRight02_img, (player_x_pos,player_y_pos))
+            rightStage = 0
+            pygame.time.delay(50)
+        
+    if directionIndicator == 3: # Travelling Left
+        if leftStage == 0:
+            screen.blit(characterLeft01_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if leftStage == 1:
+            screen.blit(characterLeft_img, (player_x_pos,player_y_pos))
+            pygame.time.delay(50)
+            
+        if leftStage == 2:
+            screen.blit(characterLeft02_img, (player_x_pos,player_y_pos))
+            leftStage = 0
+            pygame.time.delay(50)
     
 
     pygame.display.flip()
