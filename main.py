@@ -16,6 +16,9 @@ backimg_y = 0
 # animation_increment=10
 clock_tick_rate=20
 
+counter, text = 59, '59'
+pygame.time.set_timer(pygame.USEREVENT, 1000)
+
 # getScreenMode 
 # This function will set the screen mode 2 modes below the current one
 # for screen size convenience / compatibility
@@ -64,13 +67,19 @@ screen = pygame.display.set_mode(screenMode)
 screenX = (screen.get_width() / 2) - 300
 screenY = (screen.get_height() / 2) - 300
 
-player_x_pos = 300
-player_y_pos = 300
+player_x_pos = 150
+player_y_pos = 150
 
 # Load a font to use for the game 
 GAME_FONT = pygame.freetype.Font("font/typewriter.ttf", 72)
 
 transcolour = (0,255,33)
+
+# Load information board 
+information_board = pygame.image.load("images/infoboard.jpg").convert()
+
+# Load shrub image 
+shrub_img = pygame.image.load("images/shrub01_img.png").convert()
 
 # Irn Bru can object
 irnBruObj_img = pygame.image.load("images/irnbruobj.png").convert()
@@ -98,6 +107,7 @@ characterRight01_img = pygame.image.load("images/charright01.png").convert()
 characterRight02_img = pygame.image.load("images/charright02.png").convert()
 
 screen.set_colorkey(transcolour)
+shrub_img.set_colorkey(transcolour)
 characterFront_img.set_colorkey(transcolour)
 characterBack_img.set_colorkey(transcolour)
 characterLeft_img.set_colorkey(transcolour)
@@ -120,8 +130,15 @@ game_grid = pygame.image.load("images/gamegrid.jpg").convert()
 irnBruCan = pygame.image.load("images/irnbrucan.png").convert()
 irnBruCan.set_colorkey(transcolour)
 
+irnBruInfo_img = irnBruCan 
+
+irnBruInfo_img = pygame.transform.scale(irnBruInfo_img, (52,90))
+
 # Load Wafer image 
 wafer_img = pygame.image.load("images/wafer_img.jpg").convert()
+
+waferInfo_img = wafer_img 
+waferInfo_img = pygame.transform.scale(waferInfo_img, (170,45))
 
 wafer_obj = wafer_img 
 
@@ -144,7 +161,11 @@ characterLeft02_img = pygame.transform.scale(characterLeft02_img, (50,50))
 characterRight01_img = pygame.transform.scale(characterRight01_img, (50,50))
 characterRight02_img = pygame.transform.scale(characterRight02_img, (50,50))
 
+shrub_img = pygame.transform.scale(shrub_img, (50,50))
+
 irnBruObj_img = pygame.transform.scale(irnBruObj_img, (30,50))
+
+information_board = pygame.transform.scale(information_board, (800,600))
 
 background_img = pygame.transform.scale(background_img, screenMode)
 
@@ -217,14 +238,70 @@ canActive = True
 
 waferobj_x_pos = 600
 waferobj_y_pos = 600
+waferActive = True
+
+# Irn-Bru game object structure
+irnBruObjCounter = 0
+irnBruObjStruct = []
+
+irnBruObjStruct.append([500,500,True])
+irnBruObjStruct.append([400,400,True])
+irnBruObjStruct.append([200,700,True])
+irnBruObjStruct.append([800,200,True])
+irnBruObjStruct.append([700,775,True])
+irnBruObjStruct.append([300,800,True])
+irnBruObjStruct.append([300,950,True])
+irnBruObjStruct.append([900,600,True])
+
 
 irnBruScore = 0
+irnBruVertLength = 40 # 40 pixels
+irnBruHorizLength = 30 # 30 pixels 
 waferScore = 0
+
+waferObjCounter = 0
+
+waferObjStruct = []
+
+waferObjStruct.append([600,600,True])
+waferObjStruct.append([700,925,True])
+waferObjStruct.append([400,800,True])
+waferObjStruct.append([300,400,True])
+
+timerMinValue = 14
+timesUp = False
+
+######################
+##  MAIN GAME LOOP  ##
+######################
 
 while(dead==False):    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             dead = True
+            
+        if event.type == pygame.USEREVENT:            
+            if timesUp == False:            
+                counter-=1
+                text = str(counter)
+            
+                if counter < 0:
+                    if timerMinValue > 0:
+                        timerMinValue = timerMinValue - 1
+                        counter = 59
+                        text = str(counter)
+                        
+                    if timerMinValue == 0:
+                        counter = 59
+                        text = str(counter)
+                        timesUp = True
+                
+                #if counter == 0 and timerMinValue == 0:
+                #    timesUp = True
+                
+            if timesUp == True:
+                counter = 0
+                text = str(counter)
             
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             # Check to see if the Escape key has been pressed (exit's the game program)
@@ -234,29 +311,48 @@ while(dead==False):
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_RIGHT]:
-        player_x_pos = player_x_pos + player_speed
+        leftStage = 0
+        upStage = 0
+        downStage = 0
+        if player_x_pos <= 1000:
+            player_x_pos = player_x_pos + player_speed
         rightStage = rightStage + 1
         directionIndicator = 2
         
     if keys[pygame.K_LEFT]:
-        player_x_pos = player_x_pos - player_speed
+        rightStage = 0
+        upStage = 0
+        downStage = 0
+        if player_x_pos >= 125:
+            player_x_pos = player_x_pos - player_speed
         leftStage = leftStage + 1
         directionIndicator = 3
         
     if keys[pygame.K_UP]:
-        player_y_pos = player_y_pos - player_speed
+        downStage = 0
+        rightStage = 0
+        leftStage = 0
+        if player_y_pos >= 125:
+            player_y_pos = player_y_pos - player_speed
         upStage = upStage + 1
         directionIndicator = 1
         
-    if keys[pygame.K_DOWN]:
-         player_y_pos = player_y_pos + player_speed
-         downStage = downStage + 1
-         directionIndicator = 0
+    if keys[pygame.K_DOWN]:        
+        upStage = 0
+        rightStage = 0
+        leftStage = 0
+        if player_y_pos <= 1000:
+            player_y_pos = player_y_pos + player_speed
+        downStage = downStage + 1
+        directionIndicator = 0
 
     screen.blit(background_img, (0,0))
     screen.blit(game_grid, (100,100))   
     screen.blit(irnBruCan, (1200, 100))
     screen.blit(wafer_img, (1450, 150))
+    screen.blit(information_board, (1150,300))
+    screen.blit(irnBruInfo_img, (1300,450))
+    screen.blit(waferInfo_img, (1250,650))
     
     text_surface, rect = GAME_FONT.render(str(irnBruScore), (0, 255, 33))
     screen.blit(text_surface, (1350, 150))
@@ -264,23 +360,95 @@ while(dead==False):
     waferscore, rect = GAME_FONT.render(str(waferScore), (0,255,33))
     screen.blit(waferscore, (1850,150))
     
+    irnBruPointsInfo, rect = GAME_FONT.render(" = 2 POINTS", (0,255,33))
+    screen.blit(irnBruPointsInfo, (1350,470))
+    
+    waferPointsInfo, rect = GAME_FONT.render(" = 1 POINT", (0,255,33))
+    screen.blit(waferPointsInfo, (1400,650))
+    
     timelimit, rect = GAME_FONT.render("TIME - ", (0,255,33))
     screen.blit(timelimit, (600,25))
     
-    timelimitvalue, rect = GAME_FONT.render("0:00", (0,255,33))
+    if timerMinValue < 10:
+        timelimitvalue, rect = GAME_FONT.render("0" + str(timerMinValue) + ":", (0,255,33))
+        
+    if timerMinValue >= 10:
+        timelimitvalue, rect = GAME_FONT.render(str(timerMinValue) + ":", (0,255,33))
+    
     screen.blit(timelimitvalue, (900,25))
     
+    if int(text) < 10:
+        timlimit, rect = GAME_FONT.render("0"+text, (0,255,33))
+        
+    if int(text) >= 10:    
+        timlimit, rect = GAME_FONT.render(text, (0,255,33))
+    
+    screen.blit(timlimit, (990,25))
+    
+    # Output shrub on screen (L-Block)
+    screen.blit(shrub_img, (250,250))
+    screen.blit(shrub_img, (300,250))
+    screen.blit(shrub_img, (200,250))
+    screen.blit(shrub_img, (200,300))
+    screen.blit(shrub_img, (200,350))
+    
+    # Output 6-block 
+    screen.blit(shrub_img, (800,400))
+    screen.blit(shrub_img, (850,400))
+    screen.blit(shrub_img, (900,400))
+    screen.blit(shrub_img, (800,450))
+    screen.blit(shrub_img, (850,450))
+    screen.blit(shrub_img, (900,450))
+    
+    # Output 6-block 
+    screen.blit(shrub_img, (300,650))
+    screen.blit(shrub_img, (350,650))
+    screen.blit(shrub_img, (400,650))
+    screen.blit(shrub_img, (300,700))
+    screen.blit(shrub_img, (350,700))
+    screen.blit(shrub_img, (400,700))
+    
+    # Output L-block shape 
+    screen.blit(shrub_img, (750,750))
+    screen.blit(shrub_img, (750,800))
+    screen.blit(shrub_img, (750,850))
+    screen.blit(shrub_img, (700,850))
+    screen.blit(shrub_img, (650,850))
+    
     # Output objects on game grid 
-    if canActive == True:
-        screen.blit(irnBruObj_img, (irnbruobj_x_pos,irnbruobj_y_pos))
+    while irnBruObjCounter < len(irnBruObjStruct):
+        if irnBruObjStruct[irnBruObjCounter][2] == True:
+            screen.blit(irnBruObj_img, (irnBruObjStruct[irnBruObjCounter][0],irnBruObjStruct[irnBruObjCounter][1]))
+        irnBruObjCounter = irnBruObjCounter + 1
     
-    screen.blit(wafer_obj, (waferobj_x_pos,waferobj_y_pos))  
+    irnBruObjCounter = 0
+    
+    while waferObjCounter < len(waferObjStruct):
+        if waferObjStruct[waferObjCounter][2] == True:
+            screen.blit(wafer_obj, (waferObjStruct[waferObjCounter][0],waferObjStruct[waferObjCounter][1]))  
+        waferObjCounter = waferObjCounter + 1
+        
+    waferObjCounter = 0
 
-    if player_x_pos >= irnbruobj_x_pos and player_x_pos <= (irnbruobj_x_pos+30) and player_y_pos >= irnbruobj_y_pos and player_y_pos <= (irnbruobj_y_pos+50) and canActive == True:
-        irnBruScore = irnBruScore + 2
-        canActive = False 
+    # Collision detection with Irn-Bru objects on the game grid 
     
+    while irnBruObjCounter < len(irnBruObjStruct):
+        if player_x_pos >= (irnBruObjStruct[irnBruObjCounter][0]-irnBruHorizLength) and player_x_pos <= (irnBruObjStruct[irnBruObjCounter][0]+irnBruHorizLength) and player_y_pos >= (irnBruObjStruct[irnBruObjCounter][1]-irnBruVertLength) and player_y_pos <= (irnBruObjStruct[irnBruObjCounter][1]+irnBruVertLength) and irnBruObjStruct[irnBruObjCounter][2] == True:
+            irnBruScore = irnBruScore + 2
+            irnBruObjStruct[irnBruObjCounter][2] = False 
+        irnBruObjCounter = irnBruObjCounter + 1
+        
+    irnBruObjCounter = 0
     
+    # Detect collision with caramel wafer object 
+    while waferObjCounter < len(waferObjStruct):
+        if player_x_pos >= (waferObjStruct[waferObjCounter][0]-30) and player_x_pos <= (waferObjStruct[waferObjCounter][0]+30) and player_y_pos >= (waferObjStruct[waferObjCounter][1]-35) and player_y_pos <= (waferObjStruct[waferObjCounter][1]+35) and waferObjStruct[waferObjCounter][2] == True:
+            waferScore = waferScore + 1
+            waferObjStruct[waferObjCounter][2] = False      
+        waferObjCounter = waferObjCounter + 1
+        
+    waferObjCounter = 0
+
     if directionIndicator == 0: # Travelling Down
         if downStage == 0:
             screen.blit(characterFront01_img, (player_x_pos,player_y_pos))
