@@ -268,7 +268,7 @@ waferObjStruct.append([700,925,True])
 waferObjStruct.append([400,800,True])
 waferObjStruct.append([300,400,True])
 
-timerMinValue = 14
+timerMinValue = 15
 timesUp = False
 
 ######################
