@@ -5,9 +5,98 @@
 
 import pygame
 import pygame.freetype
+from enum import Enum 
 
 # Initialise PyGame
 pygame.init()
+
+# Set window title 
+pygame.display.set_caption("Irn-Bru Project")
+
+# Initialise clock 
+clock = pygame.time.Clock()
+
+##########################
+## Game Data Structures ##
+##########################
+
+# Shrub wall 1 (L-Block)
+shrubLBlock_01 = []
+shrubLBlock_01.append([200,250])
+shrubLBlock_01.append([250,250])
+shrubLBlock_01.append([300,250])    
+shrubLBlock_01.append([200,300])
+shrubLBlock_01.append([200,350])
+
+# Shrub wall 2 (6-block)
+shrub6Block_02 = []    
+shrub6Block_02.append([800,400])
+shrub6Block_02.append([850,400])
+shrub6Block_02.append([900,400])
+shrub6Block_02.append([800,450])
+shrub6Block_02.append([850,450])
+shrub6Block_02.append([900,450])
+
+# Shrub wall 3 (6-block)
+shrub6Block_03 = []    
+shrub6Block_03.append([300,650])
+shrub6Block_03.append([350,650])
+shrub6Block_03.append([400,650])
+shrub6Block_03.append([300,700])
+shrub6Block_03.append([350,700])
+shrub6Block_03.append([400,700])
+
+# Irn-Bru object structure 
+irnBruObjStruct = []
+irnBruObjStruct.append([500,500,True])
+irnBruObjStruct.append([400,400,True])
+irnBruObjStruct.append([200,700,True])
+irnBruObjStruct.append([800,200,True])
+irnBruObjStruct.append([700,775,True])
+irnBruObjStruct.append([300,800,True])
+irnBruObjStruct.append([300,950,True])
+irnBruObjStruct.append([900,600,True])
+
+# Wafer object structure 
+waferObjStruct = []
+waferObjStruct.append([600,600,True])
+waferObjStruct.append([700,925,True])
+waferObjStruct.append([400,800,True])
+waferObjStruct.append([300,400,True])
+
+# Enumeration for direction player is facing (to be implemented)
+class Direction(Enum):
+    DOWN_DIRECTION = 0
+    UP_DIRECTION = 1
+    RIGHT_DIRECTION = 2
+    LEFT_DIRECTION = 3
+
+######################
+## Global variables ##
+######################
+
+# Player Position (x and y)
+player_x_pos = 150
+player_y_pos = 150
+# Player Speed 
+player_speed = 8
+directionIndicator = 0 # (To be replaced with enum)
+
+# Irn-Bru 
+irnBruScore = 0
+irnBruVertLength = 40 # 40 pixels (irn-bru object image)
+irnBruHorizLength = 30 # 30 pixels (irb-bru object image)
+irnBruObjCounter = 0
+
+# Caramel Wafer 
+waferScore = 0
+waferObjCounter = 0
+
+# Animation stages (used for sequencing of frames)
+leftStage = 0
+rightStage = 0
+upStage = 0
+downStage = 0
 
 # Background image position values
 backimg_x = 0
@@ -16,11 +105,27 @@ backimg_y = 0
 # animation_increment=10
 clock_tick_rate=20
 
+# Load a font to use for the game 
+GAME_FONT = pygame.freetype.Font("font/typewriter.ttf", 72)
+
+# The colour to exclude when loading in sprite images 
+transcolour = (0,255,33)
+
+# Font and game timer settings 
 counter, text = 59, '59'
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
+timerMinValue = 0
+timesUp = False
+
+dead=False # Used to terminate the game loop 
+
+#############################
+## Screen Resolution Setup ##
+#############################
+
 # getScreenMode 
-# This function will set the screen mode 2 modes below the current one
+# This function will set the screen mode 2 modes below the current one (Further improvement needed)
 # for screen size convenience / compatibility
 def getScreenMode():
     
@@ -63,17 +168,9 @@ def getScreenMode():
 screenMode = getScreenMode()
 screen = pygame.display.set_mode(screenMode)
 
-# Get centre of screen values 
-screenX = (screen.get_width() / 2) - 300
-screenY = (screen.get_height() / 2) - 300
-
-player_x_pos = 150
-player_y_pos = 150
-
-# Load a font to use for the game 
-GAME_FONT = pygame.freetype.Font("font/typewriter.ttf", 72)
-
-transcolour = (0,255,33)
+###################################
+## Load Images used for the game ##
+###################################
 
 # Load information board 
 information_board = pygame.image.load("images/infoboard.jpg").convert()
@@ -106,6 +203,28 @@ characterLeft02_img = pygame.image.load("images/charleft02.png").convert()
 characterRight01_img = pygame.image.load("images/charright01.png").convert()
 characterRight02_img = pygame.image.load("images/charright02.png").convert()
 
+# Load the Game Grid image
+game_grid = pygame.image.load("images/gamegrid.jpg").convert()
+
+# Load Irn-Bru can image 
+irnBruCan = pygame.image.load("images/irnbrucan.png").convert()
+
+# Load Wafer image 
+wafer_img = pygame.image.load("images/wafer_img.jpg").convert()
+
+# Background image 
+background_img = pygame.image.load("images/background_img.jpg").convert()
+
+# Copy already loaded images to use for rescaling
+waferInfo_img = wafer_img 
+wafer_obj = wafer_img 
+irnBruInfo_img = irnBruCan
+
+################################
+## Image Transcolour settings ##
+################################
+
+# Set the colour to ignore on the images 
 screen.set_colorkey(transcolour)
 shrub_img.set_colorkey(transcolour)
 characterFront_img.set_colorkey(transcolour)
@@ -120,34 +239,14 @@ characterLeft01_img.set_colorkey(transcolour)
 characterLeft02_img.set_colorkey(transcolour)
 characterRight01_img.set_colorkey(transcolour)
 characterRight02_img.set_colorkey(transcolour)
-
 irnBruObj_img.set_colorkey(transcolour)
-
-# Load the Game Grid image
-game_grid = pygame.image.load("images/gamegrid.jpg").convert()
-
-# Load Irn-Bru can image 
-irnBruCan = pygame.image.load("images/irnbrucan.png").convert()
 irnBruCan.set_colorkey(transcolour)
 
-irnBruInfo_img = irnBruCan 
+###################
+## Image scaling ##
+###################
 
-irnBruInfo_img = pygame.transform.scale(irnBruInfo_img, (52,90))
-
-# Load Wafer image 
-wafer_img = pygame.image.load("images/wafer_img.jpg").convert()
-
-waferInfo_img = wafer_img 
-waferInfo_img = pygame.transform.scale(waferInfo_img, (170,45))
-
-wafer_obj = wafer_img 
-
-wafer_obj = pygame.transform.scale(wafer_obj, (50,25))
-
-# Background image 
-background_img = pygame.image.load("images/background_img.jpg").convert()
-
-# Scale down the grass floor image 
+# Image scale down from 100x100 to 50x50px
 characterFront_img = pygame.transform.scale(characterFront_img, (50,50))
 characterBack_img = pygame.transform.scale(characterBack_img, (50,50))
 characterLeft_img = pygame.transform.scale(characterLeft_img, (50,50))
@@ -160,116 +259,105 @@ characterLeft01_img = pygame.transform.scale(characterLeft01_img, (50,50))
 characterLeft02_img = pygame.transform.scale(characterLeft02_img, (50,50))
 characterRight01_img = pygame.transform.scale(characterRight01_img, (50,50))
 characterRight02_img = pygame.transform.scale(characterRight02_img, (50,50))
-
 shrub_img = pygame.transform.scale(shrub_img, (50,50))
 
+# Specific scale downs
+irnBruInfo_img = pygame.transform.scale(irnBruInfo_img, (52,90))
+waferInfo_img = pygame.transform.scale(waferInfo_img, (170,45))
+wafer_obj = pygame.transform.scale(wafer_obj, (50,25))
 irnBruObj_img = pygame.transform.scale(irnBruObj_img, (30,50))
-
 information_board = pygame.transform.scale(information_board, (800,600))
-
 background_img = pygame.transform.scale(background_img, screenMode)
 
-pygame.display.set_caption("Irn-Bru Project")
+##############################################
+## Shrub Wall Collision Detection Functions ##
+##############################################
 
-dead=False
-
-clock = pygame.time.Clock()
-
-def setGameWorld():
-    global room1data
+# Collistion Detection for 3rd shrub wall 
+def detectShrub_03_Collision(x_pos,y_pos):
+    global directionIndicator
+    global shrub6Block_03
+    global player_speed
     
-    # Set L block square 
-    room1data[21][1] = 1
-    room1data[31][1] = 1
-    room1data[41][1] = 1
-    room1data[42][1] = 1
-    room1data[43][1] = 1
+    if directionIndicator == 0 and y_pos > (shrub6Block_03[0][1]-50) and y_pos < (shrub6Block_03[3][1]+50) and x_pos > (shrub6Block_03[0][0]-50) and x_pos < (shrub6Block_03[2][0]+50):
+        y_pos = y_pos - player_speed
+        
+    if directionIndicator == 2 and x_pos > (shrub6Block_03[0][0]-50) and x_pos < (shrub6Block_03[2][0]+50) and y_pos > (shrub6Block_03[0][1]-50) and y_pos < (shrub6Block_03[3][1]+50):
+        x_pos = x_pos - player_speed
+        
+    # Up direction 
+    if directionIndicator == 1 and y_pos < (shrub6Block_03[3][1]+50) and y_pos > (shrub6Block_03[0][1]-50) and x_pos > (shrub6Block_03[0][0]-50) and x_pos < (shrub6Block_03[2][0]+50):
+        y_pos = y_pos + player_speed
+        
+    # Left direction 
+    if directionIndicator == 3 and x_pos < (shrub6Block_03[2][0]+50) and x_pos > (shrub6Block_03[0][0]-50) and y_pos > (shrub6Block_03[2][1]-50) and y_pos < (shrub6Block_03[5][1]+50):
+        x_pos = x_pos + player_speed
+        
+    return x_pos, y_pos
+
+# Collision Detection for 2nd shrub wall 
+def detectShrub_02_Collision(x_pos,y_pos):
+    global directionIndicator
+    global shrub6Block_02
+    global player_speed
     
-    # Set 2nd block square 
-    room1data[46][1] = 1
-    room1data[47][1] = 1
-    room1data[48][1] = 1
-    room1data[58][1] = 1
-    room1data[68][1] = 1
+    if directionIndicator == 0 and y_pos > (shrub6Block_02[0][1]-50) and y_pos < (shrub6Block_02[3][1]+50) and x_pos > (shrub6Block_02[0][0]-50) and x_pos < (shrub6Block_02[2][0]+50):
+        y_pos = y_pos - player_speed
+        
+    if directionIndicator == 2 and x_pos > (shrub6Block_02[0][0]-50) and x_pos < (shrub6Block_02[2][0]+50) and y_pos > (shrub6Block_02[0][1]-50) and y_pos < (shrub6Block_02[3][1]+50):
+        x_pos = x_pos - player_speed
+        
+    # Up direction 
+    if directionIndicator == 1 and y_pos < (shrub6Block_02[3][1]+50) and y_pos > (shrub6Block_02[0][1]-50) and x_pos > (shrub6Block_02[0][0]-50) and x_pos < (shrub6Block_02[2][0]+50):
+        y_pos = y_pos + player_speed
+        
+    # Left direction 
+    if directionIndicator == 3 and x_pos < (shrub6Block_02[2][0]+50) and x_pos > (shrub6Block_02[0][0]-50) and y_pos > (shrub6Block_02[2][1]-50) and y_pos < (shrub6Block_02[5][1]+50):
+        x_pos = x_pos + player_speed
+        
+    return x_pos, y_pos
+
+# Collision Detection for 1st shrub wall 
+def detectShrub_01_Collision(x_pos,y_pos):
+    global directionIndicator
+    global shrubLBlock_01
+    global player_speed
     
-    # Create Rectangle square block 
-    room1data[63][1] = 1
-    room1data[73][1] = 1
-    room1data[64][1] = 1
-    room1data[74][1] = 1
-    room1data[65][1] = 1
-    room1data[75][1] = 1
-
-
-# Function: draw_grid
-# Description: This function is used to draw a grid (room) at
-#               a specified position and width and height
-def draw_grid(gridDataIn, screenIn):
-    # Include the texture    
-    global standard_GridSquare_img
-    global sandfloor_img
-    global shrub_img
+    # Collision detection for first L-block (down direction)
     
-    for gridTile in gridDataIn:
-        if gridTile[1] == 0:
-            screenIn.blit(sandfloor_img, gridTile[0])
-        if gridTile[1] == 1:
-            screenIn.blit(shrub_img, gridTile[0])
-
+    if directionIndicator == 0 and y_pos > (shrubLBlock_01[0][1]-50) and y_pos < (shrubLBlock_01[0][1]+50) and x_pos > (shrubLBlock_01[0][0]-50) and x_pos < (shrubLBlock_01[2][0]+50):
+        y_pos = y_pos - player_speed
+        
+    # Collision detection for first L-block (right direction)
     
-screen.blit(background_img, (0,0))
-screen.blit(game_grid, (100,100))
-screen.blit(irnBruCan, (1200, 100))
-screen.blit(wafer_img, (1450, 150))
-screen.blit(characterFront_img, (player_x_pos,player_y_pos))
-directionIndicator = 0 # Front facing (down direction)
+    if directionIndicator == 2 and x_pos > (shrubLBlock_01[0][0]-50) and x_pos < (shrubLBlock_01[0][0]+50) and y_pos > (shrubLBlock_01[0][1]-50) and y_pos < (shrubLBlock_01[4][1]+50):
+        x_pos = x_pos - player_speed
+        
+    # Collision detection for first L-block (left direction)
+    
+    if directionIndicator == 3:
+        
+        if x_pos < (shrubLBlock_01[2][0]+50) and x_pos > (shrubLBlock_01[0][0]-50) and y_pos > (shrubLBlock_01[2][1]-50) and y_pos < (shrubLBlock_01[2][1]+50):
+            x_pos = x_pos + player_speed
+            
+        if x_pos < (shrubLBlock_01[3][0]+50) and x_pos > (shrubLBlock_01[3][0]-50) and y_pos > (shrubLBlock_01[3][1]-50) and y_pos < (shrubLBlock_01[4][1]+50):
+            x_pos = x_pos + player_speed
+    
+    # Collision detection for first L-block (up direction)
+    
+    if directionIndicator == 1:
+        
+        if y_pos < (shrubLBlock_01[4][1]+50) and y_pos > (shrubLBlock_01[0][1]-50) and x_pos > (shrubLBlock_01[4][0]-50) and x_pos < (shrubLBlock_01[4][0]+50):
+            y_pos = y_pos + player_speed
+            
+        if y_pos < (shrubLBlock_01[1][1]+50) and y_pos > (shrubLBlock_01[1][1]-50) and x_pos > (shrubLBlock_01[1][0]) and x_pos < (shrubLBlock_01[2][0]+50):
+            y_pos = y_pos + player_speed
+            
+            
+    return x_pos, y_pos
+    
+    
 
-# Animation stages
-leftStage = 0
-rightStage = 0
-upStage = 0
-downStage = 0
-
-player_speed = 8
-
-irnbruobj_x_pos = 500
-irnbruobj_y_pos = 500
-canActive = True
-
-waferobj_x_pos = 600
-waferobj_y_pos = 600
-waferActive = True
-
-# Irn-Bru game object structure
-irnBruObjCounter = 0
-irnBruObjStruct = []
-
-irnBruObjStruct.append([500,500,True])
-irnBruObjStruct.append([400,400,True])
-irnBruObjStruct.append([200,700,True])
-irnBruObjStruct.append([800,200,True])
-irnBruObjStruct.append([700,775,True])
-irnBruObjStruct.append([300,800,True])
-irnBruObjStruct.append([300,950,True])
-irnBruObjStruct.append([900,600,True])
-
-
-irnBruScore = 0
-irnBruVertLength = 40 # 40 pixels
-irnBruHorizLength = 30 # 30 pixels 
-waferScore = 0
-
-waferObjCounter = 0
-
-waferObjStruct = []
-
-waferObjStruct.append([600,600,True])
-waferObjStruct.append([700,925,True])
-waferObjStruct.append([400,800,True])
-waferObjStruct.append([300,400,True])
-
-timerMinValue = 15
-timesUp = False
 
 ######################
 ##  MAIN GAME LOOP  ##
@@ -296,20 +384,47 @@ while(dead==False):
                         text = str(counter)
                         timesUp = True
                 
-                #if counter == 0 and timerMinValue == 0:
-                #    timesUp = True
+            if counter == 0 and timerMinValue == 0:
+                print("*** TIME'S UP! GAME OVER ***")
+                dead = True
                 
             if timesUp == True:
                 counter = 0
                 text = str(counter)
             
-        if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+        if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:            
+
             # Check to see if the Escape key has been pressed (exit's the game program)
             if event.key == pygame.K_ESCAPE:
                 dead = True
                 
     keys = pygame.key.get_pressed()
 
+    ############################################################
+    ## Handle diagonal entries (to prevent diagonal movement) ##
+    ############################################################
+    
+    if keys[pygame.K_RIGHT] and keys[pygame.K_DOWN]:
+        player_x_pos = player_x_pos - player_speed
+        player_y_pos = player_y_pos - player_speed
+        
+    if keys[pygame.K_LEFT] and keys [pygame.K_DOWN]:
+        player_x_pos = player_x_pos + player_speed
+        player_y_pos = player_y_pos - player_speed
+        
+    if keys[pygame.K_RIGHT] and keys[pygame.K_UP]:
+        player_x_pos = player_x_pos - player_speed
+        player_y_pos = player_y_pos + player_speed
+        
+    if keys[pygame.K_LEFT] and keys[pygame.K_UP]:
+        player_x_pos = player_x_pos + player_speed
+        player_y_pos = player_y_pos + player_speed
+    
+    
+    #######################################################
+    ## Handle Player Directions (Left,Right,Up and Down) ##
+    #######################################################    
+    
     if keys[pygame.K_RIGHT]:
         leftStage = 0
         upStage = 0
@@ -346,6 +461,10 @@ while(dead==False):
         downStage = downStage + 1
         directionIndicator = 0
 
+    ################################
+    ## Display Game Screen Layout ##
+    ################################
+    
     screen.blit(background_img, (0,0))
     screen.blit(game_grid, (100,100))   
     screen.blit(irnBruCan, (1200, 100))
@@ -369,6 +488,7 @@ while(dead==False):
     timelimit, rect = GAME_FONT.render("TIME - ", (0,255,33))
     screen.blit(timelimit, (600,25))
     
+    # Handle 0's with number of digits showing
     if timerMinValue < 10:
         timelimitvalue, rect = GAME_FONT.render("0" + str(timerMinValue) + ":", (0,255,33))
         
@@ -384,36 +504,29 @@ while(dead==False):
         timlimit, rect = GAME_FONT.render(text, (0,255,33))
     
     screen.blit(timlimit, (990,25))
-    
+
     # Output shrub on screen (L-Block)
-    screen.blit(shrub_img, (250,250))
-    screen.blit(shrub_img, (300,250))
-    screen.blit(shrub_img, (200,250))
-    screen.blit(shrub_img, (200,300))
-    screen.blit(shrub_img, (200,350))
+    screen.blit(shrub_img, shrubLBlock_01[0])
+    screen.blit(shrub_img, shrubLBlock_01[1])
+    screen.blit(shrub_img, shrubLBlock_01[2])
+    screen.blit(shrub_img, shrubLBlock_01[3])
+    screen.blit(shrub_img, shrubLBlock_01[4])    
     
     # Output 6-block 
-    screen.blit(shrub_img, (800,400))
-    screen.blit(shrub_img, (850,400))
-    screen.blit(shrub_img, (900,400))
-    screen.blit(shrub_img, (800,450))
-    screen.blit(shrub_img, (850,450))
-    screen.blit(shrub_img, (900,450))
-    
+    screen.blit(shrub_img, shrub6Block_02[0])
+    screen.blit(shrub_img, shrub6Block_02[1])
+    screen.blit(shrub_img, shrub6Block_02[2])
+    screen.blit(shrub_img, shrub6Block_02[3])
+    screen.blit(shrub_img, shrub6Block_02[4])
+    screen.blit(shrub_img, shrub6Block_02[5])
+
     # Output 6-block 
-    screen.blit(shrub_img, (300,650))
-    screen.blit(shrub_img, (350,650))
-    screen.blit(shrub_img, (400,650))
-    screen.blit(shrub_img, (300,700))
-    screen.blit(shrub_img, (350,700))
-    screen.blit(shrub_img, (400,700))
-    
-    # Output L-block shape 
-    screen.blit(shrub_img, (750,750))
-    screen.blit(shrub_img, (750,800))
-    screen.blit(shrub_img, (750,850))
-    screen.blit(shrub_img, (700,850))
-    screen.blit(shrub_img, (650,850))
+    screen.blit(shrub_img, shrub6Block_03[0])
+    screen.blit(shrub_img, shrub6Block_03[1])
+    screen.blit(shrub_img, shrub6Block_03[2])
+    screen.blit(shrub_img, shrub6Block_03[3])
+    screen.blit(shrub_img, shrub6Block_03[4])
+    screen.blit(shrub_img, shrub6Block_03[5])
     
     # Output objects on game grid 
     while irnBruObjCounter < len(irnBruObjStruct):
@@ -449,6 +562,18 @@ while(dead==False):
         
     waferObjCounter = 0
 
+    #################################################
+    ## Player Collision Detection with Shrub Walls ##
+    #################################################
+    
+    player_x_pos, player_y_pos = detectShrub_01_Collision(player_x_pos, player_y_pos)
+    player_x_pos, player_y_pos = detectShrub_02_Collision(player_x_pos, player_y_pos)
+    player_x_pos, player_y_pos = detectShrub_03_Collision(player_x_pos, player_y_pos)    
+
+    ###############################
+    ## Player Animation Sequence ##
+    ###############################
+    
     if directionIndicator == 0: # Travelling Down
         if downStage == 0:
             screen.blit(characterFront01_img, (player_x_pos,player_y_pos))
@@ -462,9 +587,7 @@ while(dead==False):
             screen.blit(characterFront02_img, (player_x_pos, player_y_pos))
             downStage = 0
             pygame.time.delay(50)
-            
-        
-        
+
     if directionIndicator == 1: # Travelling Up
         if upStage == 0:
             screen.blit(characterBack01_img, (player_x_pos,player_y_pos))
@@ -506,7 +629,10 @@ while(dead==False):
             screen.blit(characterLeft02_img, (player_x_pos,player_y_pos))
             leftStage = 0
             pygame.time.delay(50)
-    
+            
+    if irnBruScore == 16 and waferScore == 4:
+        print("*** LEVEL COMPLETED ***")        
+        dead = True 
 
     pygame.display.flip()
     clock.tick(clock_tick_rate)
