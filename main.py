@@ -20,49 +20,56 @@ clock = pygame.time.Clock()
 ## Game Data Structures ##
 ##########################
 
+shrubScale = 25
+
+# Game Grid image position 
+gamegrid_xpos = 100
+gamegrid_ypos = 100
+gamegrid_wall_width = 25
+
 # Shrub wall 1 (L-Block)
 shrubLBlock_01 = []
-shrubLBlock_01.append([200,250])
-shrubLBlock_01.append([250,250])
-shrubLBlock_01.append([300,250])    
-shrubLBlock_01.append([200,300])
-shrubLBlock_01.append([200,350])
+shrubLBlock_01.append([(gamegrid_xpos+gamegrid_wall_width+50),(gamegrid_ypos+gamegrid_wall_width+50)])
+shrubLBlock_01.append([(shrubLBlock_01[0][0]+shrubScale),(gamegrid_ypos+gamegrid_wall_width+50)])
+shrubLBlock_01.append([(shrubLBlock_01[1][0]+shrubScale),(gamegrid_ypos+gamegrid_wall_width+50)])    
+shrubLBlock_01.append([(gamegrid_xpos+gamegrid_wall_width+50),(shrubLBlock_01[2][1]+shrubScale)])
+shrubLBlock_01.append([(gamegrid_xpos+gamegrid_wall_width+50),(shrubLBlock_01[3][1]+shrubScale)])
 
 # Shrub wall 2 (6-block)
 shrub6Block_02 = []    
-shrub6Block_02.append([800,400])
-shrub6Block_02.append([850,400])
-shrub6Block_02.append([900,400])
-shrub6Block_02.append([800,450])
-shrub6Block_02.append([850,450])
-shrub6Block_02.append([900,450])
+shrub6Block_02.append([(gamegrid_xpos+gamegrid_wall_width+300),(gamegrid_ypos+gamegrid_wall_width+150)])
+shrub6Block_02.append([(shrub6Block_02[0][0]+shrubScale),(shrub6Block_02[0][1])])
+shrub6Block_02.append([(shrub6Block_02[1][0]+shrubScale),(shrub6Block_02[1][1])])
+shrub6Block_02.append([shrub6Block_02[0][0],(shrub6Block_02[1][1]+shrubScale)])
+shrub6Block_02.append([(shrub6Block_02[0][0]+shrubScale),(shrub6Block_02[3][1])])
+shrub6Block_02.append([(shrub6Block_02[1][0]+shrubScale),(shrub6Block_02[3][1])])
 
 # Shrub wall 3 (6-block)
 shrub6Block_03 = []    
-shrub6Block_03.append([300,650])
-shrub6Block_03.append([350,650])
-shrub6Block_03.append([400,650])
-shrub6Block_03.append([300,700])
-shrub6Block_03.append([350,700])
-shrub6Block_03.append([400,700])
+shrub6Block_03.append([(gamegrid_xpos+gamegrid_wall_width+100),(gamegrid_ypos+gamegrid_wall_width+300)])
+shrub6Block_03.append([(shrub6Block_03[0][0]+shrubScale),(shrub6Block_03[0][1])])
+shrub6Block_03.append([(shrub6Block_03[1][0]+shrubScale),(shrub6Block_03[1][1])])
+shrub6Block_03.append([(shrub6Block_03[0][0]),(shrub6Block_03[2][1]+shrubScale)])
+shrub6Block_03.append([(shrub6Block_03[1][0]),(shrub6Block_03[3][1])])
+shrub6Block_03.append([(shrub6Block_03[2][0]),(shrub6Block_03[3][1])])
 
 # Irn-Bru object structure 
 irnBruObjStruct = []
-irnBruObjStruct.append([500,500,True])
-irnBruObjStruct.append([400,400,True])
-irnBruObjStruct.append([200,700,True])
-irnBruObjStruct.append([800,200,True])
-irnBruObjStruct.append([700,775,True])
-irnBruObjStruct.append([300,800,True])
-irnBruObjStruct.append([300,950,True])
-irnBruObjStruct.append([900,600,True])
+irnBruObjStruct.append([(gamegrid_xpos+400),(gamegrid_ypos+400),True])
+irnBruObjStruct.append([(gamegrid_xpos+300),(gamegrid_ypos+300),True])
+irnBruObjStruct.append([(gamegrid_xpos+100),(gamegrid_ypos+450),True]) # 100, 450
+irnBruObjStruct.append([(gamegrid_xpos+300),(gamegrid_ypos+100),True]) # 300, 100
+irnBruObjStruct.append([(gamegrid_xpos+50),(gamegrid_ypos+300),True]) # 50,300
+irnBruObjStruct.append([(gamegrid_xpos+200),(gamegrid_ypos+200),True]) # 200, 200
+irnBruObjStruct.append([(gamegrid_xpos+300),(gamegrid_ypos+450),True]) # 300, 450
+irnBruObjStruct.append([(gamegrid_xpos+100),(gamegrid_ypos+200),True]) # 100,200
 
 # Wafer object structure 
 waferObjStruct = []
-waferObjStruct.append([600,600,True])
-waferObjStruct.append([700,925,True])
-waferObjStruct.append([400,800,True])
-waferObjStruct.append([300,400,True])
+waferObjStruct.append([(gamegrid_xpos+450),(gamegrid_ypos+25),True]) # 450, 25
+waferObjStruct.append([(gamegrid_xpos+150),(gamegrid_ypos+300),True]) # 150,300
+waferObjStruct.append([(gamegrid_xpos+300),(gamegrid_ypos+400),True]) # 300,400
+waferObjStruct.append([(gamegrid_xpos+400),(gamegrid_ypos+300),True]) # 400,300
 
 # Enumeration for direction player is facing (to be implemented)
 class Direction(Enum):
@@ -84,8 +91,8 @@ directionIndicator = 0 # (To be replaced with enum)
 
 # Irn-Bru 
 irnBruScore = 0
-irnBruVertLength = 40 # 40 pixels (irn-bru object image)
-irnBruHorizLength = 30 # 30 pixels (irb-bru object image)
+irnBruVertLength = 25 # 40 pixels (irn-bru object image)
+irnBruHorizLength = 15 # 30 pixels (irb-bru object image)
 irnBruObjCounter = 0
 
 # Caramel Wafer 
@@ -115,7 +122,7 @@ transcolour = (0,255,33)
 counter, text = 59, '59'
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
-timerMinValue = 0
+timerMinValue = 5
 timesUp = False
 
 dead=False # Used to terminate the game loop 
@@ -124,48 +131,8 @@ dead=False # Used to terminate the game loop
 ## Screen Resolution Setup ##
 #############################
 
-# getScreenMode 
-# This function will set the screen mode 2 modes below the current one (Further improvement needed)
-# for screen size convenience / compatibility
-def getScreenMode():
-    
-    # Get all available screen modes 
-    available_screen_modes = pygame.display.list_modes()
-    
-    # Get current display setup
-    current_display_mode = pygame.display.Info()
-    
-    # Set a default screen mode until determination is reached
-    selectedScreenMode = available_screen_modes[1]
-    
-    # Set index counter
-    indexCounter = 0
-    
-    # Set index value 
-    indexValue = 0
-    
-    # Search for screen mode currently selected by default
-    for screen_mode in available_screen_modes:
-        widthValue = screen_mode[0]
-        heightValue = screen_mode[1]
-        
-        # If found, get the index value of the screen setting which is found 
-        if widthValue == current_display_mode.current_w and heightValue == current_display_mode.current_h:
-            indexValue = indexCounter 
-            
-        indexCounter = indexCounter + 1        
-   
-    # Get how long the list of available screen modes is 
-    screenModeListLength = len(available_screen_modes)
-    
-    # Formula to calculate 
-    if (indexValue+2) <= (screenModeListLength-1):
-        selectedScreenMode = available_screen_modes[indexValue+2]
-        
-    return selectedScreenMode
-
 # Set and get screen mode 
-screenMode = getScreenMode()
+screenMode = (1366,768)
 screen = pygame.display.set_mode(screenMode)
 
 ###################################
@@ -216,9 +183,7 @@ wafer_img = pygame.image.load("images/wafer_img.jpg").convert()
 background_img = pygame.image.load("images/background_img.jpg").convert()
 
 # Copy already loaded images to use for rescaling
-waferInfo_img = wafer_img 
 wafer_obj = wafer_img 
-irnBruInfo_img = irnBruCan
 
 ################################
 ## Image Transcolour settings ##
@@ -246,28 +211,34 @@ irnBruCan.set_colorkey(transcolour)
 ## Image scaling ##
 ###################
 
+characterScaleSize = 25
+
 # Image scale down from 100x100 to 50x50px
-characterFront_img = pygame.transform.scale(characterFront_img, (50,50))
-characterBack_img = pygame.transform.scale(characterBack_img, (50,50))
-characterLeft_img = pygame.transform.scale(characterLeft_img, (50,50))
-characterRight_img = pygame.transform.scale(characterRight_img, (50,50))
-characterFront01_img = pygame.transform.scale(characterFront01_img, (50,50))
-characterFront02_img = pygame.transform.scale(characterFront02_img, (50,50))
-characterBack01_img = pygame.transform.scale(characterBack01_img, (50,50))
-characterBack02_img = pygame.transform.scale(characterBack02_img, (50,50))
-characterLeft01_img = pygame.transform.scale(characterLeft01_img, (50,50))
-characterLeft02_img = pygame.transform.scale(characterLeft02_img, (50,50))
-characterRight01_img = pygame.transform.scale(characterRight01_img, (50,50))
-characterRight02_img = pygame.transform.scale(characterRight02_img, (50,50))
-shrub_img = pygame.transform.scale(shrub_img, (50,50))
+characterFront_img = pygame.transform.scale(characterFront_img, (characterScaleSize,characterScaleSize))
+characterBack_img = pygame.transform.scale(characterBack_img, (characterScaleSize,characterScaleSize))
+characterLeft_img = pygame.transform.scale(characterLeft_img, (characterScaleSize,characterScaleSize))
+characterRight_img = pygame.transform.scale(characterRight_img, (characterScaleSize,characterScaleSize))
+characterFront01_img = pygame.transform.scale(characterFront01_img, (characterScaleSize,characterScaleSize))
+characterFront02_img = pygame.transform.scale(characterFront02_img, (characterScaleSize,characterScaleSize))
+characterBack01_img = pygame.transform.scale(characterBack01_img, (characterScaleSize,characterScaleSize))
+characterBack02_img = pygame.transform.scale(characterBack02_img, (characterScaleSize,characterScaleSize))
+characterLeft01_img = pygame.transform.scale(characterLeft01_img, (characterScaleSize,characterScaleSize))
+characterLeft02_img = pygame.transform.scale(characterLeft02_img, (characterScaleSize,characterScaleSize))
+characterRight01_img = pygame.transform.scale(characterRight01_img, (characterScaleSize,characterScaleSize))
+characterRight02_img = pygame.transform.scale(characterRight02_img, (characterScaleSize,characterScaleSize))
+
+# Scale shrub image 
+shrubScale = 25
+shrub_img = pygame.transform.scale(shrub_img, (shrubScale,shrubScale))
 
 # Specific scale downs
-irnBruInfo_img = pygame.transform.scale(irnBruInfo_img, (52,90))
-waferInfo_img = pygame.transform.scale(waferInfo_img, (170,45))
-wafer_obj = pygame.transform.scale(wafer_obj, (50,25))
-irnBruObj_img = pygame.transform.scale(irnBruObj_img, (30,50))
-information_board = pygame.transform.scale(information_board, (800,600))
+wafer_obj = pygame.transform.scale(wafer_obj, (25,14))
+irnBruObj_img = pygame.transform.scale(irnBruObj_img, (15,25))
+information_board = pygame.transform.scale(information_board, (400,250))
 background_img = pygame.transform.scale(background_img, screenMode)
+
+# Resize the game grid
+game_grid = pygame.transform.scale(game_grid, (500,500))
 
 ##############################################
 ## Shrub Wall Collision Detection Functions ##
@@ -279,18 +250,18 @@ def detectShrub_03_Collision(x_pos,y_pos):
     global shrub6Block_03
     global player_speed
     
-    if directionIndicator == 0 and y_pos > (shrub6Block_03[0][1]-50) and y_pos < (shrub6Block_03[3][1]+50) and x_pos > (shrub6Block_03[0][0]-50) and x_pos < (shrub6Block_03[2][0]+50):
+    if directionIndicator == 0 and y_pos > (shrub6Block_03[0][1]-characterScaleSize) and y_pos < (shrub6Block_03[3][1]+characterScaleSize) and x_pos > (shrub6Block_03[0][0]-characterScaleSize) and x_pos < (shrub6Block_03[2][0]+characterScaleSize):
         y_pos = y_pos - player_speed
         
-    if directionIndicator == 2 and x_pos > (shrub6Block_03[0][0]-50) and x_pos < (shrub6Block_03[2][0]+50) and y_pos > (shrub6Block_03[0][1]-50) and y_pos < (shrub6Block_03[3][1]+50):
+    if directionIndicator == 2 and x_pos > (shrub6Block_03[0][0]-characterScaleSize) and x_pos < (shrub6Block_03[2][0]+characterScaleSize) and y_pos > (shrub6Block_03[0][1]-characterScaleSize) and y_pos < (shrub6Block_03[3][1]+characterScaleSize):
         x_pos = x_pos - player_speed
         
     # Up direction 
-    if directionIndicator == 1 and y_pos < (shrub6Block_03[3][1]+50) and y_pos > (shrub6Block_03[0][1]-50) and x_pos > (shrub6Block_03[0][0]-50) and x_pos < (shrub6Block_03[2][0]+50):
+    if directionIndicator == 1 and y_pos < (shrub6Block_03[3][1]+characterScaleSize) and y_pos > (shrub6Block_03[0][1]-characterScaleSize) and x_pos > (shrub6Block_03[0][0]-characterScaleSize) and x_pos < (shrub6Block_03[2][0]+characterScaleSize):
         y_pos = y_pos + player_speed
         
     # Left direction 
-    if directionIndicator == 3 and x_pos < (shrub6Block_03[2][0]+50) and x_pos > (shrub6Block_03[0][0]-50) and y_pos > (shrub6Block_03[2][1]-50) and y_pos < (shrub6Block_03[5][1]+50):
+    if directionIndicator == 3 and x_pos < (shrub6Block_03[2][0]+characterScaleSize) and x_pos > (shrub6Block_03[0][0]-characterScaleSize) and y_pos > (shrub6Block_03[2][1]-characterScaleSize) and y_pos < (shrub6Block_03[5][1]+characterScaleSize):
         x_pos = x_pos + player_speed
         
     return x_pos, y_pos
@@ -301,18 +272,18 @@ def detectShrub_02_Collision(x_pos,y_pos):
     global shrub6Block_02
     global player_speed
     
-    if directionIndicator == 0 and y_pos > (shrub6Block_02[0][1]-50) and y_pos < (shrub6Block_02[3][1]+50) and x_pos > (shrub6Block_02[0][0]-50) and x_pos < (shrub6Block_02[2][0]+50):
+    if directionIndicator == 0 and y_pos > (shrub6Block_02[0][1]-characterScaleSize) and y_pos < (shrub6Block_02[3][1]+characterScaleSize) and x_pos > (shrub6Block_02[0][0]-characterScaleSize) and x_pos < (shrub6Block_02[2][0]+characterScaleSize):
         y_pos = y_pos - player_speed
         
-    if directionIndicator == 2 and x_pos > (shrub6Block_02[0][0]-50) and x_pos < (shrub6Block_02[2][0]+50) and y_pos > (shrub6Block_02[0][1]-50) and y_pos < (shrub6Block_02[3][1]+50):
+    if directionIndicator == 2 and x_pos > (shrub6Block_02[0][0]-characterScaleSize) and x_pos < (shrub6Block_02[2][0]+characterScaleSize) and y_pos > (shrub6Block_02[0][1]-characterScaleSize) and y_pos < (shrub6Block_02[3][1]+characterScaleSize):
         x_pos = x_pos - player_speed
         
     # Up direction 
-    if directionIndicator == 1 and y_pos < (shrub6Block_02[3][1]+50) and y_pos > (shrub6Block_02[0][1]-50) and x_pos > (shrub6Block_02[0][0]-50) and x_pos < (shrub6Block_02[2][0]+50):
+    if directionIndicator == 1 and y_pos < (shrub6Block_02[3][1]+characterScaleSize) and y_pos > (shrub6Block_02[0][1]-characterScaleSize) and x_pos > (shrub6Block_02[0][0]-characterScaleSize) and x_pos < (shrub6Block_02[2][0]+characterScaleSize):
         y_pos = y_pos + player_speed
         
     # Left direction 
-    if directionIndicator == 3 and x_pos < (shrub6Block_02[2][0]+50) and x_pos > (shrub6Block_02[0][0]-50) and y_pos > (shrub6Block_02[2][1]-50) and y_pos < (shrub6Block_02[5][1]+50):
+    if directionIndicator == 3 and x_pos < (shrub6Block_02[2][0]+characterScaleSize) and x_pos > (shrub6Block_02[0][0]-characterScaleSize) and y_pos > (shrub6Block_02[2][1]-characterScaleSize) and y_pos < (shrub6Block_02[5][1]+characterScaleSize):
         x_pos = x_pos + player_speed
         
     return x_pos, y_pos
@@ -325,39 +296,36 @@ def detectShrub_01_Collision(x_pos,y_pos):
     
     # Collision detection for first L-block (down direction)
     
-    if directionIndicator == 0 and y_pos > (shrubLBlock_01[0][1]-50) and y_pos < (shrubLBlock_01[0][1]+50) and x_pos > (shrubLBlock_01[0][0]-50) and x_pos < (shrubLBlock_01[2][0]+50):
+    if directionIndicator == 0 and y_pos > (shrubLBlock_01[0][1]-characterScaleSize) and y_pos < (shrubLBlock_01[0][1]+characterScaleSize) and x_pos > (shrubLBlock_01[0][0]-characterScaleSize) and x_pos < (shrubLBlock_01[2][0]+characterScaleSize):
         y_pos = y_pos - player_speed
         
     # Collision detection for first L-block (right direction)
     
-    if directionIndicator == 2 and x_pos > (shrubLBlock_01[0][0]-50) and x_pos < (shrubLBlock_01[0][0]+50) and y_pos > (shrubLBlock_01[0][1]-50) and y_pos < (shrubLBlock_01[4][1]+50):
+    if directionIndicator == 2 and x_pos > (shrubLBlock_01[0][0]-characterScaleSize) and x_pos < (shrubLBlock_01[0][0]+characterScaleSize) and y_pos > (shrubLBlock_01[0][1]-characterScaleSize) and y_pos < (shrubLBlock_01[4][1]+characterScaleSize):
         x_pos = x_pos - player_speed
         
     # Collision detection for first L-block (left direction)
     
     if directionIndicator == 3:
         
-        if x_pos < (shrubLBlock_01[2][0]+50) and x_pos > (shrubLBlock_01[0][0]-50) and y_pos > (shrubLBlock_01[2][1]-50) and y_pos < (shrubLBlock_01[2][1]+50):
+        if x_pos < (shrubLBlock_01[2][0]+characterScaleSize) and x_pos > (shrubLBlock_01[0][0]-characterScaleSize) and y_pos > (shrubLBlock_01[2][1]-characterScaleSize) and y_pos < (shrubLBlock_01[2][1]+characterScaleSize):
             x_pos = x_pos + player_speed
             
-        if x_pos < (shrubLBlock_01[3][0]+50) and x_pos > (shrubLBlock_01[3][0]-50) and y_pos > (shrubLBlock_01[3][1]-50) and y_pos < (shrubLBlock_01[4][1]+50):
+        if x_pos < (shrubLBlock_01[3][0]+characterScaleSize) and x_pos > (shrubLBlock_01[3][0]-characterScaleSize) and y_pos > (shrubLBlock_01[3][1]-characterScaleSize) and y_pos < (shrubLBlock_01[4][1]+characterScaleSize):
             x_pos = x_pos + player_speed
     
     # Collision detection for first L-block (up direction)
     
     if directionIndicator == 1:
         
-        if y_pos < (shrubLBlock_01[4][1]+50) and y_pos > (shrubLBlock_01[0][1]-50) and x_pos > (shrubLBlock_01[4][0]-50) and x_pos < (shrubLBlock_01[4][0]+50):
+        if y_pos < (shrubLBlock_01[4][1]+characterScaleSize) and y_pos > (shrubLBlock_01[0][1]-characterScaleSize) and x_pos > (shrubLBlock_01[4][0]-characterScaleSize) and x_pos < (shrubLBlock_01[4][0]+characterScaleSize):
             y_pos = y_pos + player_speed
             
-        if y_pos < (shrubLBlock_01[1][1]+50) and y_pos > (shrubLBlock_01[1][1]-50) and x_pos > (shrubLBlock_01[1][0]) and x_pos < (shrubLBlock_01[2][0]+50):
+        if y_pos < (shrubLBlock_01[1][1]+characterScaleSize) and y_pos > (shrubLBlock_01[1][1]-characterScaleSize) and x_pos > (shrubLBlock_01[1][0]) and x_pos < (shrubLBlock_01[2][0]+characterScaleSize):
             y_pos = y_pos + player_speed
             
             
     return x_pos, y_pos
-    
-    
-
 
 ######################
 ##  MAIN GAME LOOP  ##
@@ -429,7 +397,7 @@ while(dead==False):
         leftStage = 0
         upStage = 0
         downStage = 0
-        if player_x_pos <= 1000:
+        if player_x_pos <= (game_grid.get_width()+gamegrid_xpos-(gamegrid_wall_width*2)):
             player_x_pos = player_x_pos + player_speed
         rightStage = rightStage + 1
         directionIndicator = 2
@@ -438,7 +406,7 @@ while(dead==False):
         rightStage = 0
         upStage = 0
         downStage = 0
-        if player_x_pos >= 125:
+        if player_x_pos >= (gamegrid_xpos+gamegrid_wall_width):
             player_x_pos = player_x_pos - player_speed
         leftStage = leftStage + 1
         directionIndicator = 3
@@ -447,7 +415,7 @@ while(dead==False):
         downStage = 0
         rightStage = 0
         leftStage = 0
-        if player_y_pos >= 125:
+        if player_y_pos >= (gamegrid_ypos+gamegrid_wall_width):
             player_y_pos = player_y_pos - player_speed
         upStage = upStage + 1
         directionIndicator = 1
@@ -456,7 +424,7 @@ while(dead==False):
         upStage = 0
         rightStage = 0
         leftStage = 0
-        if player_y_pos <= 1000:
+        if player_y_pos <= (game_grid.get_height()+gamegrid_ypos-(gamegrid_wall_width*2)):
             player_y_pos = player_y_pos + player_speed
         downStage = downStage + 1
         directionIndicator = 0
@@ -466,27 +434,25 @@ while(dead==False):
     ################################
     
     screen.blit(background_img, (0,0))
-    screen.blit(game_grid, (100,100))   
-    screen.blit(irnBruCan, (1200, 100))
-    screen.blit(wafer_img, (1450, 150))
-    screen.blit(information_board, (1150,300))
-    screen.blit(irnBruInfo_img, (1300,450))
-    screen.blit(waferInfo_img, (1250,650))
+    screen.blit(game_grid, (gamegrid_xpos,gamegrid_ypos))   
+    
+    # Game Score Irn Bru image 
+    screen.blit(irnBruCan, (gamegrid_xpos+550, gamegrid_ypos))
+    
+    # Game Score wafer image 
+    screen.blit(wafer_img, (gamegrid_xpos+780, gamegrid_ypos+50))
+    
+    # Display information board relative position to game grid
+    screen.blit(information_board, (gamegrid_xpos+550,gamegrid_ypos+250))
     
     text_surface, rect = GAME_FONT.render(str(irnBruScore), (0, 255, 33))
-    screen.blit(text_surface, (1350, 150))
+    screen.blit(text_surface, (gamegrid_xpos+700, gamegrid_ypos+50))
     
     waferscore, rect = GAME_FONT.render(str(waferScore), (0,255,33))
-    screen.blit(waferscore, (1850,150))
-    
-    irnBruPointsInfo, rect = GAME_FONT.render(" = 2 POINTS", (0,255,33))
-    screen.blit(irnBruPointsInfo, (1350,470))
-    
-    waferPointsInfo, rect = GAME_FONT.render(" = 1 POINT", (0,255,33))
-    screen.blit(waferPointsInfo, (1400,650))
+    screen.blit(waferscore, (gamegrid_xpos+1170,gamegrid_ypos+50))
     
     timelimit, rect = GAME_FONT.render("TIME - ", (0,255,33))
-    screen.blit(timelimit, (600,25))
+    screen.blit(timelimit, (gamegrid_xpos+300,gamegrid_ypos-80))
     
     # Handle 0's with number of digits showing
     if timerMinValue < 10:
@@ -495,7 +461,7 @@ while(dead==False):
     if timerMinValue >= 10:
         timelimitvalue, rect = GAME_FONT.render(str(timerMinValue) + ":", (0,255,33))
     
-    screen.blit(timelimitvalue, (900,25))
+    screen.blit(timelimitvalue, (gamegrid_xpos+600,gamegrid_ypos-80))
     
     if int(text) < 10:
         timlimit, rect = GAME_FONT.render("0"+text, (0,255,33))
@@ -503,7 +469,7 @@ while(dead==False):
     if int(text) >= 10:    
         timlimit, rect = GAME_FONT.render(text, (0,255,33))
     
-    screen.blit(timlimit, (990,25))
+    screen.blit(timlimit, (gamegrid_xpos+690,gamegrid_ypos-80))
 
     # Output shrub on screen (L-Block)
     screen.blit(shrub_img, shrubLBlock_01[0])
